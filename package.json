@@ -1,0 +1,49 @@
+{
+  "name": "tssdk",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "test:unit": "vue-cli-service test:unit",
+    "lib": "vue-cli-service build --target lib --name ZeepinSDK --dest lib packages/index.js",
+    "analyz": "NODE_ENV=production npm_config_report=true npm run build"
+  },
+  "dependencies": {
+    "@types/crypto-js": "^3.1.43",
+    "@types/node": "^11.13.0",
+    "axios": "^0.18.0",
+    "base-58": "0.0.1",
+    "base64-url": "^2.2.1",
+    "bignumber.js": "^8.1.1",
+    "core-js": "^2.6.5",
+    "crypto": "^1.0.1",
+    "crypto-browserify": "^3.12.0",
+    "crypto-js": "^3.1.9-1",
+    "js-sha3": "^0.8.0",
+    "long": "^4.0.0",
+    "scrypt-async": "^2.0.1",
+    "secure-random": "^1.1.1",
+    "sm.js": "^0.1.7",
+    "vue": "^2.6.6",
+    "vue-class-component": "^6.0.0",
+    "vue-property-decorator": "^8.0.0",
+    "vue-router": "^3.0.1",
+    "vuex": "^3.0.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^23.1.4",
+    "@types/node": "^11.13.0",
+    "@vue/cli-plugin-babel": "^3.5.0",
+    "@vue/cli-plugin-typescript": "^3.5.0",
+    "@vue/cli-plugin-unit-jest": "^3.5.0",
+    "@vue/cli-service": "^3.5.0",
+    "@vue/test-utils": "1.0.0-beta.29",
+    "babel-core": "7.0.0-bridge.0",
+    "compression-webpack-plugin": "^2.0.0",
+    "ts-jest": "^23.0.0",
+    "typescript": "^3.2.1",
+    "vue-template-compiler": "^2.5.21",
+    "webpack-bundle-analyzer": "^3.2.0"
+  }
+}
