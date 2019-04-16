@@ -3,6 +3,11 @@ import { ERROR_CODE } from "./error";
 import * as Long from "long";
 import { bigIntToBytes, reverseHex } from "./functionsUtils";
 
+export class resultParams{
+    name: string = '';
+    value: string = '';
+}
+
 
 export class BigInt {
     value: string | number;

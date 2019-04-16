@@ -9,7 +9,7 @@
         name: 'Index',
         mounted () {
             // this.test()
-            // this.searchCurrency()
+            this.searchCurrency()
             // this.testTransaction()
 
         },
@@ -56,8 +56,8 @@
             async searchCurrency () {
                 let native = await sdk.balanceOfNative('ZNEo7CMRpQXGDgSwvhm2iDGPTXhVRJcMfc')
                 console.log(native)
-                let zusd = await sdk.balanceOfZUSD('ZNEo7CMRpQXGDgSwvhm2iDGPTXhVRJcMfc')
-                console.log(zusd)
+                let otherAssets = await sdk.balanceOfOthers('ZNEo7CMRpQXGDgSwvhm2iDGPTXhVRJcMfc')
+                console.log(otherAssets)
             },
 
             async testTransaction () {

@@ -3,7 +3,7 @@ import { Address } from "../wallet/address";
 import { TxType, Transaction } from "./transaction";
 import { InvokeCode } from "./payload";
 import {str2hexstr, reverseHex, num2hexstring, hexstr2str} from "../common/functionsUtils";
-import {defaultPayer, defaultPrivateKey, TEST_ZEEPIN_URL, ZUSD_TEST_CONTRACT} from "../common/consts";
+import {defaultPayer, defaultPrivateKey} from "../common/consts";
 import RestClient from "../network/rest/restClient";
 import {PrivateKey} from "../crypto/privateKey";
 import {signTransaction} from "./nativeTransaction";
@@ -75,6 +75,8 @@ export function getContractBalance(
         const rest = new RestClient();
         rest.sendRawTransaction(tx.serialize(), true).then((res)=> {
             const balance = hexstr2str(res.Result.Result);
+            if(balance === '')
+                resolve('0');
             resolve(balance);
         });
     })

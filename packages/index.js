@@ -1,10 +1,11 @@
-import {Wallet} from "./sdk/wallet/wallet"
-import {keystoreCheck} from "./sdk/common/functionsUtils";
+import { Wallet } from "./sdk/wallet/wallet"
+import { keystoreCheck } from "./sdk/common/functionsUtils";
+import { resultParams } from "./sdk/common/classesUtils";
 import RestClient from "./sdk/network/rest/restClient";
-import {TEST_ZEEPIN_URL, ZUSD_TEST_CONTRACT} from "./sdk/common/consts";
-import {Address} from "./sdk/wallet/address";
-import {getContractBalance} from "./sdk/transaction/wasmTransaction";
-import {nativeTransfer} from "./sdk/transaction/nativeTransaction";
+import {CONTRACTS_TEST, ZUSD_TEST_CONTRACT} from "./sdk/common/consts";
+import { Address } from "./sdk/wallet/address";
+import {contractParams, getContractBalance} from "./sdk/transaction/wasmTransaction";
+import { nativeTransfer } from "./sdk/transaction/nativeTransaction";
 import RpcClient from "./sdk/network/rpc/rpcClient";
 
 export default class Zeepin {
@@ -85,10 +86,19 @@ export default class Zeepin {
      * address: 账户地址
      */
     static balanceOfNative(address) {
+        const rest = new RestClient();
+        let result = [];
         return new Promise((resolve, reject) => {
-            const rest = new RestClient();
             rest.getBalance(new Address(address)).then((res) => {
-                resolve(res.Result)
+                let param1 = new resultParams();
+                param1.name = 'ZPT';
+                param1.value = res.Result.zpt;
+                result.push(param1);
+                let param2 = new resultParams();
+                param2.name = 'Gala';
+                param2.value = res.Result.gala;
+                result.push(param2);
+                resolve(result);
             })
         })
     }
@@ -99,8 +109,20 @@ export default class Zeepin {
      *
      * address: 账户地址
      */
-    static balanceOfZUSD(address) {
-        return getContractBalance(ZUSD_TEST_CONTRACT, address);
+    static balanceOfOthers(address) {
+        let result = [];
+        return new Promise((resolve, reject) => {
+            for (let i = 0; i < CONTRACTS_TEST.length; i++) {
+                console.log(CONTRACTS_TEST.length);
+                getContractBalance(CONTRACTS_TEST[i].contractAddr , address).then((res) => {
+                    let param = new resultParams();
+                    param.name = CONTRACTS_TEST[i].name;
+                    param.value = res;
+                    result.push(param);
+                    resolve(result);
+                })
+            }
+        })
     }
 
 
