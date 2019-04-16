@@ -138,9 +138,26 @@ export default class Zeepin {
     static nativeTransfer(tokenType, from, to, amount, fromKey) {
         return new Promise((resolve, reject) => {
             const rest = new RestClient();
+            const rpc = new RpcClient();
             const TxString = nativeTransfer(tokenType, from, to, amount, '1', '20000', fromKey);
             rest.sendRawTransaction(TxString).then((res) => {
-                resolve(res.Result)
+                if(typeof res.Result === 'string' && res.Result.length === 64) {
+                    let timer = setInterval(() => {
+                        rpc.getSmartCodeEvent(res.Result).then((getRes) => {
+                            if(getRes.result !== null) {
+                                clearInterval(timer);
+                                timer = null;
+                                console.log(getRes);
+                                if(getRes.result.State === 1)
+                                    resolve(true);
+                                else
+                                    resolve(false);
+                            }
+                        })
+                    }, 1000)
+                } else {
+                    resolve(false);
+                }
             })
         })
     }
