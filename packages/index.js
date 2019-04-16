@@ -113,13 +113,13 @@ export default class Zeepin {
         let result = [];
         return new Promise((resolve, reject) => {
             for (let i = 0; i < CONTRACTS_TEST.length; i++) {
-                console.log(CONTRACTS_TEST.length);
                 getContractBalance(CONTRACTS_TEST[i].contractAddr , address).then((res) => {
                     let param = new resultParams();
                     param.name = CONTRACTS_TEST[i].name;
                     param.value = res;
                     result.push(param);
-                    resolve(result);
+                    if(i === CONTRACTS_TEST.length - 1)
+                        resolve(result);
                 })
             }
         })
