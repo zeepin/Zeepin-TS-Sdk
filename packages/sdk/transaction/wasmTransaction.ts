@@ -3,10 +3,11 @@ import { Address } from "../wallet/address";
 import { TxType, Transaction } from "./transaction";
 import { InvokeCode } from "./payload";
 import {str2hexstr, reverseHex, num2hexstring, hexstr2str} from "../common/functionsUtils";
-import {defaultPayer, defaultPrivateKey} from "../common/consts";
+import {CONTRACTS_TEST, defaultPayer, defaultPrivateKey} from "../common/consts";
 import RestClient from "../network/rest/restClient";
 import {PrivateKey} from "../crypto/privateKey";
-import {signTransaction} from "./nativeTransaction";
+import {makeTransferTx, signTransaction} from "./nativeTransaction";
+import {ERROR_CODE} from "../common/error";
 
 export class contractParams{
     type:string='string';
@@ -80,4 +81,52 @@ export function getContractBalance(
             resolve(balance);
         });
     })
+}
+
+export function wasmTransfer(
+    tokenType: string,
+    from: string,
+    to: string,
+    amount: string,
+    gasPrice: string,
+    gasLimit: string,
+    fromKey?: string,
+    payer?: string,
+    payerKey?: string
+): string {
+    let contractAddr = '';
+    for (let i = 0; i < CONTRACTS_TEST.length; i++) {
+        if(tokenType === CONTRACTS_TEST[i].name) {
+            contractAddr = CONTRACTS_TEST[i].contractAddr;
+            break;
+        }
+    }
+    if(contractAddr === '') {
+        throw ERROR_CODE.INVALID_PARAMS;
+    }
+    let args = [];
+    args.push(from);
+    args.push(to);
+    args.push(amount);
+    let tx;
+    if(!payer) {
+        if(fromKey) {
+            const fromAddr = new Address(from);
+            tx = makeInvokeTransaction('transfer', args, contractAddr, gasPrice, gasLimit, fromAddr);
+            const fromPK = new PrivateKey(fromKey)
+            signTransaction(tx, fromPK);
+        } else {
+            throw ERROR_CODE.INVALID_PARAMS;
+        }
+    } else {
+        if(payerKey) {
+            const payerAddr = new Address(payer);
+            tx = makeInvokeTransaction('transfer', args, contractAddr, gasPrice, gasLimit, payerAddr);
+            const payerPK = new PrivateKey(payerKey);
+            signTransaction(tx, payerPK);
+        } else {
+            throw ERROR_CODE.INVALID_PARAMS;
+        }
+    }
+    return tx.serialize();
 }

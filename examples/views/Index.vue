@@ -54,10 +54,9 @@
             },
 
             async searchCurrency () {
-                // let native = await sdk.balanceOfNative('ZNEo7CMRpQXGDgSwvhm2iDGPTXhVRJcMfc')
-                // let native = await sdk.balanceOfNative('ZCFinVtGTgkb46bczTnGQySHeRRmhYtrJg')
-                // console.log(native)
-                let otherAssets = await sdk.balanceOfOthers('ZNEo7CMRpQXGDgSwvhm2iDGPTXhVRJcMfc')
+                let native = await sdk.balanceOfNative('ZTMpJFXdmgosonQn5KVy3fi8YmBkztAs4Q')
+                console.log(native)
+                let otherAssets = await sdk.balanceOfOthers('ZTMpJFXdmgosonQn5KVy3fi8YmBkztAs4Q')
                 console.log(otherAssets)
             },
 
@@ -65,7 +64,8 @@
                 let from = 'ZTMpJFXdmgosonQn5KVy3fi8YmBkztAs4Q'
                 let to = 'Za5YKANnk8mdgiqCVUbk16gPhZ5CxtBNmK'
                 let fromKey = 'c2fbcb381e1eb50209334306e37ab9c4853eb789a847092bb0879d0d69cfc344'
-                let result = await sdk.nativeTransfer('Gala', from, to, 10000, fromKey)
+                // let result = await sdk.nativeTransfer('zpt', from, to, '10000', fromKey)
+                let result = await sdk.wasmTransfer('zusd', from, to, '100000', fromKey)
                 console.log(result)
             }
         }

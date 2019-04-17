@@ -4,7 +4,7 @@ import { resultParams } from "./sdk/common/classesUtils";
 import RestClient from "./sdk/network/rest/restClient";
 import { CONTRACTS_TEST } from "./sdk/common/consts";
 import { Address } from "./sdk/wallet/address";
-import { getContractBalance} from "./sdk/transaction/wasmTransaction";
+import {getContractBalance, wasmTransfer} from "./sdk/transaction/wasmTransaction";
 import { nativeTransfer } from "./sdk/transaction/nativeTransaction";
 import RpcClient from "./sdk/network/rpc/rpcClient";
 
@@ -118,7 +118,7 @@ export default class Zeepin {
                     param.name = CONTRACTS_TEST[i].name;
                     param.value = res;
                     result.push(param);
-                    if(i === CONTRACTS_TEST.length - 1)
+                    if(result.length === CONTRACTS_TEST.length)
                         resolve(result);
                 })
             }
@@ -127,12 +127,12 @@ export default class Zeepin {
 
 
     /**
-     * ZPT和Gala转账交易
+     * zpt和gala转账交易
      *
-     * tokenType: 'zpt'或'gala', string
+     * tokenType: 'zpt'或'gala',小写, string
      * from: 转出地址, string
      * to: 转入地址, string
-     * amount: 转账金额(精度10000，如：需转账10，应填入100000), number
+     * amount: 转账金额(精度10000，如：需转账10，应填入100000), string
      * fromKey: 转出账户私钥, string
      */
     static nativeTransfer(tokenType, from, to, amount, fromKey) {
@@ -147,8 +147,43 @@ export default class Zeepin {
                             if(getRes.result !== null) {
                                 clearInterval(timer);
                                 timer = null;
-                                console.log(getRes);
                                 if(getRes.result.State === 1)
+                                    resolve(true);
+                                else
+                                    resolve(false);
+                            }
+                        })
+                    }, 1000)
+                } else {
+                    resolve(false);
+                }
+            })
+        })
+    }
+
+
+    /**
+     * zusd和7种矿石转账交易
+     *
+     * tokenType: 'zusd'或7种矿石名,小写, string
+     * from: 转出地址, string
+     * to: 转入地址, string
+     * amount: 转账金额(精度10000，如：需转账10，应填入100000), string
+     * fromKey: 转出账户私钥, string
+     */
+    static wasmTransfer(tokenType, from, to, amount, fromKey) {
+        return new Promise((resolve, reject) => {
+            const rest = new RestClient();
+            const rpc = new RpcClient();
+            const TxString = wasmTransfer(tokenType, from, to, amount, '1', '20000', fromKey);
+            rest.sendRawTransaction(TxString).then((res) => {
+                if(typeof res.Result === 'string' && res.Result.length === 64) {
+                    let timer = setInterval(() => {
+                        rpc.getSmartCodeEvent(res.Result).then((getRes) => {
+                            if(getRes.result !== null) {
+                                clearInterval(timer);
+                                timer = null;
+                                if(getRes.result.State === 1 && getRes.result.Notify[0].States[0].length > 10)
                                     resolve(true);
                                 else
                                     resolve(false);
