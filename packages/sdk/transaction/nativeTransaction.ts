@@ -56,7 +56,7 @@ export function nativeTransfer(
     payer?: string,
     payerKey?: string
 ): string {
-    if(tokenType !== 'ZPT' && tokenType !== 'Gala'){
+    if(tokenType !== 'zpt' && tokenType !== 'gala'){
         throw ERROR_CODE.INVALID_PARAMS;
     }
     const fromAddr = new Address(from);

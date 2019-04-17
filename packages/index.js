@@ -2,9 +2,9 @@ import { Wallet } from "./sdk/wallet/wallet"
 import { keystoreCheck } from "./sdk/common/functionsUtils";
 import { resultParams } from "./sdk/common/classesUtils";
 import RestClient from "./sdk/network/rest/restClient";
-import {CONTRACTS_TEST, ZUSD_TEST_CONTRACT} from "./sdk/common/consts";
+import { CONTRACTS_TEST } from "./sdk/common/consts";
 import { Address } from "./sdk/wallet/address";
-import {contractParams, getContractBalance} from "./sdk/transaction/wasmTransaction";
+import { getContractBalance} from "./sdk/transaction/wasmTransaction";
 import { nativeTransfer } from "./sdk/transaction/nativeTransaction";
 import RpcClient from "./sdk/network/rpc/rpcClient";
 
@@ -91,11 +91,11 @@ export default class Zeepin {
         return new Promise((resolve, reject) => {
             rest.getBalance(new Address(address)).then((res) => {
                 let param1 = new resultParams();
-                param1.name = 'ZPT';
+                param1.name = 'zpt';
                 param1.value = res.Result.zpt;
                 result.push(param1);
                 let param2 = new resultParams();
-                param2.name = 'Gala';
+                param2.name = 'gala';
                 param2.value = res.Result.gala;
                 result.push(param2);
                 resolve(result);
@@ -129,7 +129,7 @@ export default class Zeepin {
     /**
      * ZPT和Gala转账交易
      *
-     * tokenType: 'ZPT'或'Gala'(注意大小写规范), string
+     * tokenType: 'zpt'或'gala', string
      * from: 转出地址, string
      * to: 转入地址, string
      * amount: 转账金额(精度10000，如：需转账10，应填入100000), number
