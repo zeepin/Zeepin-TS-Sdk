@@ -150,7 +150,7 @@ export default class Zeepin {
                                 if(getRes.result.State === 1)
                                     resolve(true);
                                 else
-                                    resolve(false);
+                                    reject(false);
                             }
                         })
                     }, 1000)
@@ -186,7 +186,7 @@ export default class Zeepin {
                                 if(getRes.result.State === 1 && getRes.result.Notify[0].States[0].length > 10)
                                     resolve(true);
                                 else
-                                    resolve(false);
+                                    reject(false);
                             }
                         })
                     }, 1000)
