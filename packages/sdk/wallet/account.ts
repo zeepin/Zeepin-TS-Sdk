@@ -73,12 +73,16 @@ export class Account {
 
     static importAccountByKeystore(password: string, keystore: object): Account {
         const account = new Account();
+		// @ts-ignore
         const address = new Address(keystore.accounts[0].address);
         account.address = new Address(address.serialize());
+		// @ts-ignore
         account.label = keystore.accounts[0].label;
+		// @ts-ignore
         account.salt = keystore.accounts[0].salt;
         account.lock = false;
         account.isDefault = true;
+		// @ts-ignore
         account.encryptedKey = new PrivateKey(keystore.accounts[0].key);
         const privateKey = account.exportPrivateKey(password);
         account.publicKey = privateKey.getPublicKey().serializeHex();
@@ -90,12 +94,16 @@ export class Account {
      */
     static modifyPassword(oldPassword: string, newPassword: string, keystore: object): Account {
         const account = new Account();
+		// @ts-ignore
         const address = new Address(keystore.accounts[0].address);
         account.address = new Address(address.serialize());
+		// @ts-ignore
         account.label = keystore.accounts[0].label;
+		// @ts-ignore
         account.salt = keystore.accounts[0].salt;
         account.lock = false;
         account.isDefault = true;
+		// @ts-ignore
         account.encryptedKey = new PrivateKey(keystore.accounts[0].key);
         const privateKey = account.exportPrivateKey(oldPassword);
         account.publicKey = privateKey.getPublicKey().serializeHex();

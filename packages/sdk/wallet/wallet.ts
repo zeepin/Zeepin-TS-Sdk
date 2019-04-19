@@ -38,6 +38,7 @@ export class Wallet {
 
     static importWalletByKeystore(password: string, keystore: object): Wallet {
         const wallet = new Wallet();
+		// @ts-ignore
         wallet.defaultAccountAddress = keystore.accounts[0].address;
         wallet.accounts = [];
         wallet.accounts.push(Account.importAccountByKeystore(password, keystore));
@@ -46,6 +47,7 @@ export class Wallet {
 
     static modifyPassword(oldPassword: string, newPassword: string, keystore: object): Wallet {
         const wallet = new Wallet();
+		// @ts-ignore
         wallet.defaultAccountAddress = keystore.accounts[0].address;
         wallet.accounts = [];
         wallet.accounts.push(Account.modifyPassword(oldPassword, newPassword, keystore));

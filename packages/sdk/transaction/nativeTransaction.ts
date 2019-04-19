@@ -20,7 +20,7 @@ export function makeTransferTx(
     const num = new BigNumber(amount);
     const struct = new Struct();
     struct.add(from, to, num);
-    const list = [];
+    const list:any[] = [];
     list.push([struct]);
 
     const contract = getTokenContract(tokenType);

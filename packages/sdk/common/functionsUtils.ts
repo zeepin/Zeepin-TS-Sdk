@@ -27,7 +27,7 @@ export function sha256 (data: string) {
  * @param str hex string
  */
 export function hexstring2ab(str: string): number[] {
-    const result = [];
+    const result:number[] = [];
     while (str.length >= 2) {
         result.push(parseInt(str.substring(0, 2), 16));
         str = str.substring(2, str.length);
@@ -252,6 +252,7 @@ export function keystoreCheck(keystore: object) {
         throw ERROR_CODE.Keystore_ERROR;
     }
 
+	// @ts-ignore
     let account = keystore.accounts[0];
 
     if(!account.hasOwnProperty('address')) {

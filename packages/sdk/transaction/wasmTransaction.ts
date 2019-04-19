@@ -69,7 +69,7 @@ export function getContractBalance(
     return new Promise((resolve, reject) => {
         const payer = new Address(defaultPayer);
         const privateKey = new PrivateKey(defaultPrivateKey);
-        let args = [];
+        let args:string[] = [];
         args.push(address);
         let tx = makeInvokeTransaction('balanceOf', args, contractAddr, '1', '20000', payer);
         signTransaction(tx, privateKey);
@@ -104,7 +104,7 @@ export function wasmTransfer(
     if(contractAddr === '') {
         throw ERROR_CODE.INVALID_PARAMS;
     }
-    let args = [];
+    let args:string[] = [];
     args.push(from);
     args.push(to);
     args.push(amount);

@@ -155,7 +155,7 @@ export default class Zeepin {
                         })
                     }, 1000)
                 } else {
-                    resolve(false);
+                    reject(false);
                 }
             })
         })
@@ -191,7 +191,7 @@ export default class Zeepin {
                         })
                     }, 1000)
                 } else {
-                    resolve(false);
+                    reject(false);
                 }
             })
         })

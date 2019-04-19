@@ -8,7 +8,7 @@ export const DEFAULT_ALGORITHM = {
 };
 
 export const DEFAULT_SCRYPT = {
-    cost: 16384,
+    cost: 1024,
     blockSize: 8,
     parallel: 8,
     size: 64

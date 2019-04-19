@@ -121,7 +121,7 @@ export function readBytes(sr: StringReader) {
 }
 
 export function getParamsFromProgram(hexstr: string): string[] {
-    const sigs = [];
+    const sigs:string[] = [];
     const sr = new StringReader(hexstr);
     while (!sr.isEmpty()) {
         sigs.push(readBytes(sr));
