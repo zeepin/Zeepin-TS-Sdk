@@ -90,9 +90,8 @@ export function wasmTransfer(
     amount: string,
     gasPrice: string,
     gasLimit: string,
-    fromKey?: string,
+    fromKey: string,
     payer?: string,
-    payerKey?: string
 ): string {
     let contractAddr = '';
     for (let i = 0; i < CONTRACTS_TEST.length; i++) {
@@ -110,23 +109,13 @@ export function wasmTransfer(
     args.push(amount);
     let tx;
     if(!payer) {
-        if(fromKey) {
-            const fromAddr = new Address(from);
-            tx = makeInvokeTransaction('transfer', args, contractAddr, gasPrice, gasLimit, fromAddr);
-            const fromPK = new PrivateKey(fromKey)
-            signTransaction(tx, fromPK);
-        } else {
-            throw ERROR_CODE.INVALID_PARAMS;
-        }
+        const fromAddr = new Address(from);
+        tx = makeInvokeTransaction('transfer', args, contractAddr, gasPrice, gasLimit, fromAddr);
     } else {
-        if(payerKey) {
-            const payerAddr = new Address(payer);
-            tx = makeInvokeTransaction('transfer', args, contractAddr, gasPrice, gasLimit, payerAddr);
-            const payerPK = new PrivateKey(payerKey);
-            signTransaction(tx, payerPK);
-        } else {
-            throw ERROR_CODE.INVALID_PARAMS;
-        }
+        const payerAddr = new Address(payer);
+        tx = makeInvokeTransaction('transfer', args, contractAddr, gasPrice, gasLimit, payerAddr);
     }
+    const fromPK = new PrivateKey(fromKey)
+    signTransaction(tx, fromPK);
     return tx.serialize();
 }

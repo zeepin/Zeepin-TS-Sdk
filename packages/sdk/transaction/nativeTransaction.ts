@@ -52,9 +52,8 @@ export function nativeTransfer(
     amount: number | string,
     gasPrice: string,
     gasLimit: string,
-    fromKey?: string,
+    fromKey: string,
     payer?: string,
-    payerKey?: string
 ): string {
     if(tokenType !== 'zpt' && tokenType !== 'gala'){
         throw ERROR_CODE.INVALID_PARAMS;
@@ -63,22 +62,12 @@ export function nativeTransfer(
     const toAddr = new Address(to);
     let tx;
     if(!payer) {
-        if(fromKey) {
-            tx = makeTransferTx(tokenType, fromAddr, toAddr, amount, gasPrice, gasLimit);
-            const fromPK = new PrivateKey(fromKey)
-            signTransaction(tx, fromPK);
-        } else {
-            throw ERROR_CODE.INVALID_PARAMS;
-        }
+        tx = makeTransferTx(tokenType, fromAddr, toAddr, amount, gasPrice, gasLimit);
     } else {
         const payerAddr = new Address(payer);
-        if(payerKey) {
-            tx = makeTransferTx(tokenType, fromAddr, toAddr, amount, gasPrice, gasLimit, payerAddr);
-            const payerPK = new PrivateKey(payerKey);
-            signTransaction(tx, payerPK);
-        } else {
-            throw ERROR_CODE.INVALID_PARAMS;
-        }
+        tx = makeTransferTx(tokenType, fromAddr, toAddr, amount, gasPrice, gasLimit, payerAddr);
     }
+    const fromPK = new PrivateKey(fromKey)
+    signTransaction(tx, fromPK);
     return tx.serialize();
 }

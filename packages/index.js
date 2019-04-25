@@ -196,4 +196,32 @@ export default class Zeepin {
             })
         })
     }
+
+
+    /**
+     * 返回签名后的交易zpt/gala
+     *
+     * tokenType: 'zpt'或'gala',小写, string
+     * from: 转出地址, string
+     * to: 转入地址, string
+     * amount: 转账金额(精度10000，如：需转账10，应填入100000), string
+     * fromKey: 转出账户私钥, string
+     */
+    static nativeTransferStr(tokenType, from, to, amount, fromKey, payer) {
+        return nativeTransfer(tokenType, from, to, amount, '1', '20000', fromKey, payer);
+    }
+
+
+    /**
+     * 返回签名后的交易zust/七种矿石
+     *
+     * tokenType: 'zusd'或7种矿石名,小写, string
+     * from: 转出地址, string
+     * to: 转入地址, string
+     * amount: 转账金额(精度10000，如：需转账10，应填入100000), string
+     * fromKey: 转出账户私钥, string
+     */
+    static wasmTransferStr(tokenType, from, to, amount, fromKey, payer) {
+        return wasmTransfer(tokenType, from, to, amount, '1', '20000', fromKey, payer);
+    }
 }
