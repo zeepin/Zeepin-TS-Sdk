@@ -92,7 +92,7 @@ export function wasmTransfer(
     gasLimit: string,
     fromKey: string,
     payer?: string,
-): string {
+): String {
     let contractAddr = '';
     for (let i = 0; i < CONTRACTS_TEST.length; i++) {
         if(tokenType === CONTRACTS_TEST[i].name) {

@@ -5,9 +5,10 @@ import { Key } from "./key"
 import { KeyType, KeyParameters, SignatureScheme } from "./cryptoParams";
 import { PublicKey } from "./publicKey";
 import { Address } from "../wallet/address";
-import { encryptWithGcm, decryptWithGcm } from "./scrypt";
+import { encryptWithGcm, decryptWithGcm, ScryptParams } from "./scrypt";
 import { Signature } from "./signature";
 import { Signable} from "./signable";
+import { DEFAULT_SCRYPT } from "../common/consts";
 
 export class PrivateKey extends Key {
     /**
@@ -64,11 +65,22 @@ export class PrivateKey extends Key {
      * @param address For aad in decryption
      * @param 16 secure random bytes
      */
-    decrypt(keyphrase: string, address: Address, salt: string): PrivateKey {
+    decrypt(keyphrase: string, address: Address, salt: string, n?: number): PrivateKey {
         if (salt.length === 24 && isBase64(salt)) {
             salt = Buffer.from(salt, 'base64').toString('hex');
         }
-        const decrypted = decryptWithGcm(this.key, address, salt, keyphrase);
+        let params;
+        if (!n) {
+            params = DEFAULT_SCRYPT;
+        } else {
+            params = {
+                cost: n,
+                blockSize: 8,
+                parallel: 8,
+                size: 64
+            };
+        }
+        const decrypted = decryptWithGcm(this.key, address, salt, keyphrase, params);
         const decryptedKey = new PrivateKey(decrypted, this.algorithm, this.parameters);
         const pk = decryptedKey.getPublicKey();
         const addrTmp = Address.fromPubKey(pk);
@@ -85,13 +97,24 @@ export class PrivateKey extends Key {
      * @param address For aad in encryption
      * @param salt 16 secure random bytes
      */
-    encrypt(keyphrase: string, address: Address, salt: string): PrivateKey {
+    encrypt(keyphrase: string, address: Address, salt: string, n?: number): PrivateKey {
         const publicKey = this.getPublicKey();
         const addr = Address.fromPubKey(publicKey).toBase58();
         if (addr !== address.toBase58()) {
             throw ERROR_CODE.INVALID_ADDR;
         }
-        const encrypted = encryptWithGcm(this.key, address, salt, keyphrase);
+        let params;
+        if (!n) {
+            params = DEFAULT_SCRYPT;
+        } else {
+            params = {
+                cost: n,
+                blockSize: 8,
+                parallel: 8,
+                size: 64
+            };
+        }
+        const encrypted = encryptWithGcm(this.key, address, salt, keyphrase, params);
         return new PrivateKey(encrypted, this.algorithm, this.parameters);
     }
 

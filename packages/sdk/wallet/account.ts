@@ -84,7 +84,8 @@ export class Account {
         account.isDefault = true;
 		// @ts-ignore
         account.encryptedKey = new PrivateKey(keystore.accounts[0].key);
-        const privateKey = account.exportPrivateKey(password);
+        // @ts-ignore
+        const privateKey = account.exportPrivateKey(password, keystore.scrypt.n);
         account.publicKey = privateKey.getPublicKey().serializeHex();
         return account;
     }
@@ -105,7 +106,8 @@ export class Account {
         account.isDefault = true;
 		// @ts-ignore
         account.encryptedKey = new PrivateKey(keystore.accounts[0].key);
-        const privateKey = account.exportPrivateKey(oldPassword);
+        // @ts-ignore
+        const privateKey = account.exportPrivateKey(oldPassword, keystore.scrypt.n);
         account.publicKey = privateKey.getPublicKey().serializeHex();
         const salt = randomBytes(16);
         account.salt = Buffer.from(salt, 'hex').toString('base64');
@@ -138,7 +140,7 @@ export class Account {
         return obj;
     }
 
-    exportPrivateKey(password: string) {
-        return this.encryptedKey.decrypt(password, this.address, this.salt);
+    exportPrivateKey(password: string, n?: number) {
+        return this.encryptedKey.decrypt(password, this.address, this.salt, n);
     }
 }

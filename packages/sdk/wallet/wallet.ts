@@ -42,6 +42,8 @@ export class Wallet {
         wallet.defaultAccountAddress = keystore.accounts[0].address;
         wallet.accounts = [];
         wallet.accounts.push(Account.importAccountByKeystore(password, keystore));
+        // @ts-ignore
+        wallet.scrypt.n = keystore.scrypt.n;
         return wallet;
     }
 

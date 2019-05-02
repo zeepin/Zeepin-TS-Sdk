@@ -10,6 +10,8 @@ import RpcClient from "./sdk/network/rpc/rpcClient";
 
 export default class Zeepin {
 
+
+
     /**
      * 创建钱包
      *
@@ -56,7 +58,7 @@ export default class Zeepin {
         let obj = {
             address: wallet.accounts[0].address.toBase58(),
             keystore: wallet.toJsonObj(),
-            privateKey: wallet.accounts[0].exportPrivateKey(password).key
+            privateKey: wallet.accounts[0].exportPrivateKey(password,keystore.scrypt.n).key
         }
         return obj;
 
@@ -135,11 +137,11 @@ export default class Zeepin {
      * amount: 转账金额(精度10000，如：需转账10，应填入100000), string
      * fromKey: 转出账户私钥, string
      */
-    static nativeTransfer(tokenType, from, to, amount, fromKey) {
+    static nativeTransfer(tokenType, from, to, amount, fromKey, payer) {
         return new Promise((resolve, reject) => {
             const rest = new RestClient();
             const rpc = new RpcClient();
-            const TxString = nativeTransfer(tokenType, from, to, amount, '1', '20000', fromKey);
+            const TxString = nativeTransfer(tokenType, from, to, amount, '1', '20000', fromKey, payer);
             rest.sendRawTransaction(TxString).then((res) => {
                 if(typeof res.Result === 'string' && res.Result.length === 64) {
                     let timer = setInterval(() => {
@@ -171,11 +173,11 @@ export default class Zeepin {
      * amount: 转账金额(精度10000，如：需转账10，应填入100000), string
      * fromKey: 转出账户私钥, string
      */
-    static wasmTransfer(tokenType, from, to, amount, fromKey) {
+    static wasmTransfer(tokenType, from, to, amount, fromKey, payer) {
         return new Promise((resolve, reject) => {
             const rest = new RestClient();
             const rpc = new RpcClient();
-            const TxString = wasmTransfer(tokenType, from, to, amount, '1', '20000', fromKey);
+            const TxString = wasmTransfer(tokenType, from, to, amount, '1', '20000', fromKey, payer);
             rest.sendRawTransaction(TxString).then((res) => {
                 if(typeof res.Result === 'string' && res.Result.length === 64) {
                     let timer = setInterval(() => {

@@ -53,11 +53,12 @@ export function encryptWithGcm(
     address: Address,
     salt: string,
     keyphrase: string,
+    scryptParams: ScryptParams
 ) {
     if (!isHexString(privateKey)) {
         throw new Error(ERROR_CODE.INVALID_PARAMS + ', Invalid private key');
     }
-    const derived = scrypt(keyphrase, salt, DEFAULT_SCRYPT);
+    const derived = scrypt(keyphrase, salt, scryptParams);
     const derived1 = derived.slice(0, 12);
     const derived2 = derived.slice(32);
     const key = derived2;
@@ -88,6 +89,7 @@ export function decryptWithGcm(
     address: Address,
     salt: string,
     keyphrase: string,
+    scryptParams: ScryptParams
 ) {
     if (salt.length !== 32) {
         throw ERROR_CODE.INVALID_PARAMS;
@@ -95,7 +97,7 @@ export function decryptWithGcm(
     const result = Buffer.from(encrypted, 'base64');
     const ciphertext = result.slice(0, result.length - 16);
     const authTag = result.slice(result.length - 16);
-    const derived = scrypt(keyphrase, salt, DEFAULT_SCRYPT);
+    const derived = scrypt(keyphrase, salt, scryptParams);
     const derived1 = derived.slice(0, 12);
     const derived2 = derived.slice(32);
     const key = derived2;
