@@ -2,23 +2,23 @@ import { Wallet } from "./sdk/wallet/wallet"
 import { keystoreCheck } from "./sdk/common/functionsUtils";
 import { resultParams } from "./sdk/common/classesUtils";
 import RestClient from "./sdk/network/rest/restClient";
-import {CONTRACTS_TEST, HTTP_REST_PORT, HTTP_RPC_PORT, HTTP_WS_PORT, TEST_NODE} from "./sdk/common/consts";
+import { CONTRACTS_TEST } from "./sdk/common/consts";
 import { Address } from "./sdk/wallet/address";
 import { getContractBalance, wasmTransfer } from "./sdk/transaction/wasmTransaction";
 import { nativeTransfer } from "./sdk/transaction/nativeTransaction";
 import RpcClient from "./sdk/network/rpc/rpcClient";
 
-let URL = '192.168.199.244';
-let myUrl = `http://${URL}`;
+
+let myUrl = `http://${'192.168.199.244'}`;
 
 export default class Zeepin {
 
     static setUrl(url) {
-        URL = url;
+        myUrl = `http://${url}`;
     }
 
     static getUrl() {
-        return URL;
+        return myUrl;
     }
 
     /**
