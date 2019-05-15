@@ -63,6 +63,7 @@ export function makeInvokeTransaction(
 };
 
 export function getContractBalance(
+    url: string,
     contractAddr: string,
     address: string
 ): Promise<any> {
@@ -73,7 +74,7 @@ export function getContractBalance(
         args.push(address);
         let tx = makeInvokeTransaction('balanceOf', args, contractAddr, '1', '20000', payer);
         signTransaction(tx, privateKey);
-        const rest = new RestClient();
+        const rest = new RestClient(url);
         rest.sendRawTransaction(tx.serialize(), true).then((res)=> {
             const balance = hexstr2str(res.Result.Result);
             if(balance === '')

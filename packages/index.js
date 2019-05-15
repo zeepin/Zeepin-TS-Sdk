@@ -2,15 +2,24 @@ import { Wallet } from "./sdk/wallet/wallet"
 import { keystoreCheck } from "./sdk/common/functionsUtils";
 import { resultParams } from "./sdk/common/classesUtils";
 import RestClient from "./sdk/network/rest/restClient";
-import { CONTRACTS_TEST } from "./sdk/common/consts";
+import {CONTRACTS_TEST, HTTP_REST_PORT, HTTP_RPC_PORT, HTTP_WS_PORT, TEST_NODE} from "./sdk/common/consts";
 import { Address } from "./sdk/wallet/address";
-import {getContractBalance, wasmTransfer} from "./sdk/transaction/wasmTransaction";
+import { getContractBalance, wasmTransfer } from "./sdk/transaction/wasmTransaction";
 import { nativeTransfer } from "./sdk/transaction/nativeTransaction";
 import RpcClient from "./sdk/network/rpc/rpcClient";
 
+let URL = '192.168.199.244';
+let myUrl = `http://${URL}`;
+
 export default class Zeepin {
 
+    static setUrl(url) {
+        URL = url;
+    }
 
+    static getUrl() {
+        return URL;
+    }
 
     /**
      * 创建钱包
@@ -88,7 +97,7 @@ export default class Zeepin {
      * address: 账户地址
      */
     static balanceOfNative(address) {
-        const rest = new RestClient();
+        const rest = new RestClient(myUrl+':20334');
         let result = [];
         return new Promise((resolve, reject) => {
             rest.getBalance(new Address(address)).then((res) => {
@@ -115,7 +124,7 @@ export default class Zeepin {
         let result = [];
         return new Promise((resolve, reject) => {
             for (let i = 0; i < CONTRACTS_TEST.length; i++) {
-                getContractBalance(CONTRACTS_TEST[i].contractAddr , address).then((res) => {
+                getContractBalance(myUrl+':20334', CONTRACTS_TEST[i].contractAddr , address).then((res) => {
                     let param = new resultParams();
                     param.name = CONTRACTS_TEST[i].name;
                     param.value = res;
@@ -139,8 +148,8 @@ export default class Zeepin {
      */
     static nativeTransfer(tokenType, from, to, amount, fromKey, payer) {
         return new Promise((resolve, reject) => {
-            const rest = new RestClient();
-            const rpc = new RpcClient();
+            const rest = new RestClient(myUrl+':20334');
+            const rpc = new RpcClient(myUrl+':20336');
             const TxString = nativeTransfer(tokenType, from, to, amount, '1', '20000', fromKey, payer);
             rest.sendRawTransaction(TxString).then((res) => {
                 if(typeof res.Result === 'string' && res.Result.length === 64) {
@@ -175,8 +184,8 @@ export default class Zeepin {
      */
     static wasmTransfer(tokenType, from, to, amount, fromKey, payer) {
         return new Promise((resolve, reject) => {
-            const rest = new RestClient();
-            const rpc = new RpcClient();
+            const rest = new RestClient(myUrl+':20334');
+            const rpc = new RpcClient(myUrl+':20336');
             const TxString = wasmTransfer(tokenType, from, to, amount, '1', '20000', fromKey, payer);
             rest.sendRawTransaction(TxString).then((res) => {
                 if(typeof res.Result === 'string' && res.Result.length === 64) {

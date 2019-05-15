@@ -14,8 +14,7 @@ export const DEFAULT_SCRYPT = {
     size: 64
 };
 
-// export const TEST_NODE = '192.168.199.244'
-export const TEST_NODE = 'test1.zeepin.net'
+export const TEST_NODE = '192.168.199.244'
 
 /**
 export const MAIN_NODE = '';
