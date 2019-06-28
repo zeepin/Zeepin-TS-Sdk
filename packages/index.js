@@ -9,12 +9,12 @@ import { nativeTransfer } from "./sdk/transaction/nativeTransaction";
 import RpcClient from "./sdk/network/rpc/rpcClient";
 
 
-let myUrl = `http://${'192.168.199.244'}`;
+let myUrl = `http://192.168.199.244`;
 
 export default class Zeepin {
 
     static setUrl(url) {
-        myUrl = `http://${url}`;
+        myUrl = `${url}`;
     }
 
     static getUrl() {
