@@ -97,7 +97,7 @@ export default class Zeepin {
      * address: 账户地址
      */
     static balanceOfNative(address) {
-        const rest = new RestClient(myUrl+':20334');
+        const rest = new RestClient(myUrl);
         let result = [];
         return new Promise((resolve, reject) => {
             rest.getBalance(new Address(address)).then((res) => {
@@ -124,7 +124,7 @@ export default class Zeepin {
         let result = [];
         return new Promise((resolve, reject) => {
             for (let i = 0; i < CONTRACTS_TEST.length; i++) {
-                getContractBalance(myUrl+':20334', CONTRACTS_TEST[i].contractAddr , address).then((res) => {
+                getContractBalance(myUrl, CONTRACTS_TEST[i].contractAddr , address).then((res) => {
                     let param = new resultParams();
                     param.name = CONTRACTS_TEST[i].name;
                     param.value = res;
