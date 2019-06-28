@@ -9,7 +9,7 @@ import { nativeTransfer } from "./sdk/transaction/nativeTransaction";
 import RpcClient from "./sdk/network/rpc/rpcClient";
 
 
-let myUrl = `http://192.168.199.244`;
+let myUrl = `http://192.168.199.244:20334`;
 
 export default class Zeepin {
 
@@ -148,17 +148,16 @@ export default class Zeepin {
      */
     static nativeTransfer(tokenType, from, to, amount, fromKey, payer) {
         return new Promise((resolve, reject) => {
-            const rest = new RestClient(myUrl+':20334');
-            const rpc = new RpcClient(myUrl+':20336');
+            const rest = new RestClient(myUrl);
             const TxString = nativeTransfer(tokenType, from, to, amount, '1', '20000', fromKey, payer);
             rest.sendRawTransaction(TxString).then((res) => {
                 if(typeof res.Result === 'string' && res.Result.length === 64) {
                     let timer = setInterval(() => {
-                        rpc.getSmartCodeEvent(res.Result).then((getRes) => {
-                            if(getRes.result !== null) {
+                        rest.getSmartCodeEvent(res.Result).then((getRes) => {
+                            if(getRes.Result !== null && getRes.Result !== '') {
                                 clearInterval(timer);
                                 timer = null;
-                                if(getRes.result.State === 1)
+                                if(getRes.Result.State === 1)
                                     resolve(true);
                                 else
                                     reject(false);
@@ -184,17 +183,16 @@ export default class Zeepin {
      */
     static wasmTransfer(tokenType, from, to, amount, fromKey, payer) {
         return new Promise((resolve, reject) => {
-            const rest = new RestClient(myUrl+':20334');
-            const rpc = new RpcClient(myUrl+':20336');
+            const rest = new RestClient(myUrl);
             const TxString = wasmTransfer(tokenType, from, to, amount, '1', '20000', fromKey, payer);
             rest.sendRawTransaction(TxString).then((res) => {
                 if(typeof res.Result === 'string' && res.Result.length === 64) {
                     let timer = setInterval(() => {
-                        rpc.getSmartCodeEvent(res.Result).then((getRes) => {
-                            if(getRes.result !== null) {
+                        rest.getSmartCodeEvent(res.Result).then((getRes) => {
+                            if(getRes.Result !== null && getRes.Result !== '') {
                                 clearInterval(timer);
                                 timer = null;
-                                if(getRes.result.State === 1 && getRes.result.Notify[0].States[0].length > 10)
+                                if(getRes.Result.State === 1 && getRes.Result.Notify[0].States[0].length > 10)
                                     resolve(true);
                                 else
                                     reject(false);
