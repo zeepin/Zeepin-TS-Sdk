@@ -76,6 +76,7 @@ export function getContractBalance(
         signTransaction(tx, privateKey);
         const rest = new RestClient(url);
         rest.sendRawTransaction(tx.serialize(), true).then((res)=> {
+            console.log(res);
             const balance = hexstr2str(res.Result.Result);
             if(balance === '')
                 resolve('0');
@@ -85,7 +86,7 @@ export function getContractBalance(
 }
 
 export function wasmTransfer(
-    tokenType: string,
+    contractAddr: string,
     from: string,
     to: string,
     amount: string,
@@ -94,16 +95,6 @@ export function wasmTransfer(
     fromKey: string,
     payer?: string,
 ): String {
-    let contractAddr = '';
-    for (let i = 0; i < CONTRACTS_TEST.length; i++) {
-        if(tokenType === CONTRACTS_TEST[i].name) {
-            contractAddr = CONTRACTS_TEST[i].contractAddr;
-            break;
-        }
-    }
-    if(contractAddr === '') {
-        throw ERROR_CODE.INVALID_PARAMS;
-    }
     let args:string[] = [];
     args.push(from);
     args.push(to);

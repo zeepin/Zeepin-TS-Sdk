@@ -2,14 +2,16 @@ import { Wallet } from "./sdk/wallet/wallet"
 import { keystoreCheck } from "./sdk/common/functionsUtils";
 import { resultParams } from "./sdk/common/classesUtils";
 import RestClient from "./sdk/network/rest/restClient";
-import { CONTRACTS_TEST } from "./sdk/common/consts";
+import { CONTRACTS_TEST, CONTRACTS_MAIN } from "./sdk/common/consts";
 import { Address } from "./sdk/wallet/address";
 import { getContractBalance, wasmTransfer } from "./sdk/transaction/wasmTransaction";
 import { nativeTransfer } from "./sdk/transaction/nativeTransaction";
 import RpcClient from "./sdk/network/rpc/rpcClient";
+import {ERROR_CODE} from "./sdk/common/error";
 
 
 let myUrl = `http://192.168.199.244:20334`;
+let contracts;
 
 export default class Zeepin {
 
@@ -116,20 +118,25 @@ export default class Zeepin {
 
 
     /**
-     * 查询ZUSD余额
+     * 查询ZUSD和7种矿石余额
      *
      * address: 账户地址
      */
     static balanceOfOthers(address) {
         let result = [];
+        if(myUrl === `http://192.168.199.244:20334` || myUrl === `http://test1.zeepin.net`)
+            contracts = CONTRACTS_TEST;
+        else
+            contracts = CONTRACTS_MAIN;
+        console.log(contracts);
         return new Promise((resolve, reject) => {
-            for (let i = 0; i < CONTRACTS_TEST.length; i++) {
-                getContractBalance(myUrl, CONTRACTS_TEST[i].contractAddr , address).then((res) => {
+            for (let i = 0; i < contracts.length; i++) {
+                getContractBalance(myUrl, contracts[i].contractAddr , address).then((res) => {
                     let param = new resultParams();
-                    param.name = CONTRACTS_TEST[i].name;
+                    param.name = contracts[i].name;
                     param.value = res;
                     result.push(param);
-                    if(result.length === CONTRACTS_TEST.length)
+                    if(result.length === contracts.length)
                         resolve(result);
                 })
             }
@@ -182,9 +189,23 @@ export default class Zeepin {
      * fromKey: 转出账户私钥, string
      */
     static wasmTransfer(tokenType, from, to, amount, fromKey, payer) {
+        if(myUrl === `http://192.168.199.244:20334` || myUrl === `http://test1.zeepin.net`)
+            contracts = CONTRACTS_TEST;
+        else
+            contracts = CONTRACTS_MAIN;
+        let contractAddr = '';
+        for (let i = 0; i < contracts.length; i++) {
+            if(tokenType === contracts[i].name) {
+                contractAddr = contracts[i].contractAddr;
+                break;
+            }
+        }
+        if(contractAddr === '') {
+            throw ERROR_CODE.INVALID_PARAMS;
+        }
         return new Promise((resolve, reject) => {
             const rest = new RestClient(myUrl);
-            const TxString = wasmTransfer(tokenType, from, to, amount, '1', '20000', fromKey, payer);
+            const TxString = wasmTransfer(contractAddr, from, to, amount, '1', '20000', fromKey, payer);
             rest.sendRawTransaction(TxString).then((res) => {
                 if(typeof res.Result === 'string' && res.Result.length === 64) {
                     let timer = setInterval(() => {
