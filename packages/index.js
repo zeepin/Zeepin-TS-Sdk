@@ -128,7 +128,6 @@ export default class Zeepin {
             contracts = CONTRACTS_TEST;
         else
             contracts = CONTRACTS_MAIN;
-        console.log(contracts);
         return new Promise((resolve, reject) => {
             for (let i = 0; i < contracts.length; i++) {
                 getContractBalance(myUrl, contracts[i].contractAddr , address).then((res) => {

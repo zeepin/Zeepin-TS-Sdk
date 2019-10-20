@@ -76,7 +76,6 @@ export function getContractBalance(
         signTransaction(tx, privateKey);
         const rest = new RestClient(url);
         rest.sendRawTransaction(tx.serialize(), true).then((res)=> {
-            console.log(res);
             const balance = hexstr2str(res.Result.Result);
             if(balance === '')
                 resolve('0');

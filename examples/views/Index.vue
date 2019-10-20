@@ -64,7 +64,7 @@
             },
 
             async searchCurrency () {
-                sdk.setUrl('test1.zeepin.net')
+                sdk.setUrl('http://main1.zeepin.net:20334')
                 let native = await sdk.balanceOfNative('ZTMpJFXdmgosonQn5KVy3fi8YmBkztAs4Q')
                 console.log(native)
                 let otherAssets = await sdk.balanceOfOthers('ZTMpJFXdmgosonQn5KVy3fi8YmBkztAs4Q')
@@ -72,24 +72,24 @@
             },
 
             async testTransaction () {
-                let from = 'ZTMpJFXdmgosonQn5KVy3fi8YmBkztAs4Q'
-                let to = 'Za5YKANnk8mdgiqCVUbk16gPhZ5CxtBNmK'
-                let fromKey = 'c2fbcb381e1eb50209334306e37ab9c4853eb789a847092bb0879d0d69cfc344'
-                sdk.setUrl('test1.zeepin.net')
-                let result = await sdk.nativeTransfer('zpt', from, to, '10000', fromKey)
-                // let result = await sdk.wasmTransfer('zusd', from, to, '100000', fromKey)
+                let from = 'ZQXhii1uD8YNmx57LcPDnBWWhZVnW3QiFA'
+                let to = 'ZSUYN8cSZYoepMfD4TTFimPbzFo9a3FNuw'
+                let fromKey = 'E32A57D676E1CF0142ADE7F37C1CFC0F341DE48B4ED8D4E827040E4E7B8B8554'
+                sdk.setUrl('main1.zeepin.net')
+                // let result = await sdk.nativeTransfer('zpt', from, to, '10000', fromKey)
+                let result = await sdk.wasmTransfer('gold', from, to, '1', fromKey)
                 console.log(result)
             },
 
             testTransferStr() {
-                let from = 'ZTMpJFXdmgosonQn5KVy3fi8YmBkztAs4Q'
+                let from = 'ZQXhii1uD8YNmx57LcPDnBWWhZVnW3QiFA'
                 let to = 'Za5YKANnk8mdgiqCVUbk16gPhZ5CxtBNmK'
                 // let to = 'ZD5mb72Q6poduRufVypjPwDredVwgV9ceq'
                 let fromKey = 'c2fbcb381e1eb50209334306e37ab9c4853eb789a847092bb0879d0d69cfc344'
                 // let payer = 'ZUS7J41Yry6oh4rgHg7P4AnGZcAtovR2Z5'
                 // let payer = 'ZEuzshrCsE1cnvPuuRrDYgnVYNDtyt5d3X'
                 // let result = sdk.wasmTransferStr('zusd', from, to, '5789', fromKey)
-                let result = sdk.nativeTransferStr('zpt', from, to, '100000000003568', fromKey)
+                let result = sdk.nativeTransferStr('zpt', from, to, '15', fromKey)
                 console.log(result)
             },
 
@@ -101,7 +101,7 @@
             },
 
             testUrl() {
-                sdk.setUrl('test1.zeepin.net')
+                sdk.setUrl('https://galaxy.io')
                 let url = sdk.getUrl()
                 console.log(url)
             }
