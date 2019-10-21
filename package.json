@@ -12,7 +12,7 @@
   "dependencies": {
     "@types/crypto-js": "^3.1.43",
     "@types/node": "^11.13.0",
-    "axios": "^0.18.0",
+    "axios": "^0.18.1",
     "base-58": "0.0.1",
     "base64-url": "^2.2.1",
     "bignumber.js": "^8.1.1",
