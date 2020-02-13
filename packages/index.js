@@ -92,6 +92,25 @@ export default class Zeepin {
         return obj;
     }
 
+    /**
+     * 根据hash查询交易所在高度
+     * 
+     * txhash：交易哈希
+     */
+    static blockHeightByTxHash(txhash){
+        const rest = new RestClient(myUrl);
+        let result = []; 
+        return new Promise((resolve, reject) => {
+            rest.getBlockHeightByTxHash(txhash).then((res) => {
+                let param = new resultParams();
+                param.name = 'BlockHeight';
+                param.value = res.Result;
+                result.push(param);
+                resolve(result);
+            })
+        })
+    }
+
 
     /**
      * 查询ZPT和Gala余额
@@ -124,7 +143,7 @@ export default class Zeepin {
      */
     static balanceOfOthers(address) {
         let result = [];
-        if(myUrl === `http://192.168.199.244:20334` || myUrl === `http://test1.zeepin.net`)
+        if(myUrl === `http://192.168.199.244:20334` || myUrl === `http://test1.zeepin.net:20334`)
             contracts = CONTRACTS_TEST;
         else
             contracts = CONTRACTS_MAIN;
@@ -163,8 +182,10 @@ export default class Zeepin {
                             if(getRes.Result !== null && getRes.Result !== '') {
                                 clearInterval(timer);
                                 timer = null;
-                                if(getRes.Result.State === 1)
+                                if(getRes.Result.State === 1){
+                                    resolve(getRes.Result.TxHash);
                                     resolve(true);
+                                }
                                 else
                                     reject(false);
                             }
@@ -188,7 +209,7 @@ export default class Zeepin {
      * fromKey: 转出账户私钥, string
      */
     static wasmTransfer(tokenType, from, to, amount, fromKey, payer) {
-        if(myUrl === `http://192.168.199.244:20334` || myUrl === `http://test1.zeepin.net`)
+        if(myUrl === `http://192.168.199.244:20334` || myUrl === `http://test1.zeepin.net:20334`)
             contracts = CONTRACTS_TEST;
         else
             contracts = CONTRACTS_MAIN;
@@ -212,8 +233,10 @@ export default class Zeepin {
                             if(getRes.Result !== null && getRes.Result !== '') {
                                 clearInterval(timer);
                                 timer = null;
-                                if(getRes.Result.State === 1 && getRes.Result.Notify[0].States[0].length > 10)
+                                if(getRes.Result.State === 1 && getRes.Result.Notify[0].States[0].length > 10){
+                                    resolve(getRes.Result.TxHash);
                                     resolve(true);
+                                }
                                 else
                                     reject(false);
                             }
