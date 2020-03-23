@@ -17,6 +17,11 @@ npm install
 npm run serve
 ```
 
+### Update lib
+```
+npm run lib
+```
+
 ### Interface List
 
 | 描述                | 方法                 | 参数                                                                                                                                                 | 返回值              |
