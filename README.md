@@ -31,11 +31,14 @@ npm run lib
 | 从keystore导入钱包     | [importByKeystore](#3-importByKeystore)   | "password: 账户密码 keystore：keystore"                                                                                                                 | 钱包地址、keystore、私钥 |
 | 更改钱包密码            | [modifyPassword](#4-modifyPassword)     | "oldPassword：旧密码 newPassword：修密码 keystore：keystore"                                                                                                | 钱包地址、keystore、私钥 |
 | 查询ZPT和Gala余额      | [balanceOfNative](#5-balanceOfNative)    | address: 账户地址                                                                                                                                      |
-| 查询ZUSD和7种矿石余额     | [balanceOfOthers](#6-balanceOfOthers)   | address: 账户地址                                                                                                                                      |
-| zpt和gala转账交易      | [nativeTransfer](#7-nativeTransfer)     | "tokenType: 'zpt'或'gala',小写, string from: 转出地址, string to: 转入地址, string amount: 转账金额\(精度10000，如：需转账10，应填入100000\), string fromKey: 转出账户私钥, string" |
-| zusd和7种矿石转账交易     | [wasmTransfer](#8-wasmTransfer)       | "tokenType: 'zusd'或7种矿石名,小写, string from: 转出地址, string to: 转入地址, string amount: 转账金额\(精度10000，如：需转账10，应填入100000\), string fromKey: 转出账户私钥, string" |
-| 返回签名后的交易zpt/gala  | [nativeTransferStr](#9-nativeTransferStr)  | "tokenType: 'zpt'或'gala',小写, string from: 转出地址, string to: 转入地址, string amount: 转账金额\(精度10000，如：需转账10，应填入100000\), string fromKey: 转出账户私钥, string" | 交易签名             |
-| 返回签名后的交易zust/七种矿石 | [wasmTransferStr](#10-wasmTransferStr)    | "tokenType: 'zusd'或7种矿石名,小写, string from: 转出地址, string to: 转入地址, string amount: 转账金额\(精度10000，如：需转账10，应填入100000\), string fromKey: 转出账户私钥, string" | 交易签名             |
+| 查询ZUSD和7种矿石余额     | [balanceOfOthers](#6-balanceOfOthers)   | address: 账户地址       
+| 根据交易哈希得到该交易信息 | [smartCodeEventByTxHash](#7-smartCodeEventByTxHash) | txhash : 交易哈希                                                                                                                            |
+| zpt和gala转账交易      | [nativeTransfer](#8-nativeTransfer)     | "tokenType: 'zpt'或'gala',小写, string from: 转出地址, string to: 转入地址, string amount: 转账金额\(精度10000，如：需转账10，应填入100000\), string fromKey: 转出账户私钥, string" |
+| zusd和7种矿石转账交易     | [wasmTransfer](#9-wasmTransfer)       | "tokenType: 'zusd'或7种矿石名,小写, string from: 转出地址, string to: 转入地址, string amount: 转账金额\(精度10000，如：需转账10，应填入100000\), string fromKey: 转出账户私钥, string" |
+| 返回签名后的交易zpt/gala  | [nativeTransferStr](#10-nativeTransferStr)  | "tokenType: 'zpt'或'gala',小写, string from: 转出地址, string to: 转入地址, string amount: 转账金额\(精度10000，如：需转账10，应填入100000\), string fromKey: 转出账户私钥, string" | 交易签名             |
+| 返回签名后的交易zust/七种矿石 | [wasmTransferStr](#11-wasmTransferStr)    | "tokenType: 'zusd'或7种矿石名,小写, string from: 转出地址, string to: 转入地址, string amount: 转账金额\(精度10000，如：需转账10，应填入100000\), string fromKey: 转出账户私钥, string" | 交易签名             |
+| 返回该账户未提取的gala数量  |  [unboundGala](#12-unboundGala)       | address: 账户地址                                                                                                                                       |
+| 提取该账户未提取的gala   |  [withdrawGala](#13-withdrawGala)       | "tokenType: 'gala',小写, string claimer:申请地址, string to: 转入地址, string amount: 转账金额\(精度10000，如：需转账10，应填入100000\), string claimerKey : 转出账户私钥, string" | 交易哈希                                                                                                                                                      |
 
 #### 1. createWallet
 ```
@@ -82,7 +85,12 @@ console.log(native)
 ZeepinSDK.balanceOfOthers(address:string)
 ```
 
-#### 7. nativeTransfer
+#### 7. smartCodeEventByTxHash
+```
+ZeepinSDK.smartCodeEventByTxHash(txnhash:string)
+```
+
+#### 8. nativeTransfer
 ```
 ZeepinSDK.nativeTransfer(tokenType:string, from:string, to:string, amount:string, fromKey:string)
 ```
@@ -99,18 +107,27 @@ let result = await sdk.nativeTransfer('zpt', from, to, '10000', fromKey)
 console.log(result)
 ```
 
-#### 8. wasmTransfer
+#### 9. wasmTransfer
 ```
 ZeepinSDK.wasmTransfer(tokenType:string, from:string, to:string, amount:string, fromKey:string)
 ```
 
-#### 9. nativeTransferStr
+#### 10. nativeTransferStr
 ```
 ZeepinSDK.nativeTransferStr(tokenType:string, from:string, to:string, amount:string, fromKey:string)
 ```
 
-#### 10. wasmTransferStr
+#### 11. wasmTransferStr
 ```
 ZeepinSDK.wasmTransferStr(tokenType:string, from:string, to:string, amount:string, fromKey:string)
 ```
 
+#### 12. wasmTransferStr
+```
+ZeepinSDK.unboundGala(address:string)
+```
+
+#### 13. wasmTransferStr
+```
+ZeepinSDK.withdrawGala(tokenType:string, claimer:string, to:string, amount:string, claimerKey:string)
+```
