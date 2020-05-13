@@ -37,8 +37,9 @@
                 let to = 'ZRo3D87vgKP3MBxHPd2GSaqPFULmhmZcqX'
                 let fromKey = '2cf804f021d94c33a3a288d6fc0d74f19854f6ef01de20f3ad8b19166b221d90'
                 sdk.setUrl('http://test1.zeepin.net:20334')
-                let result = await sdk.nativeTransfer('gala', from, to, '1', fromKey)
+                // let result = await sdk.nativeTransfer('gala', from, to, '1', fromKey)
                 // let result = await sdk.wasmTransfer('gold', from, to, '1', fromKey)
+                let result = await sdk.wasmTransfers('93f750f3480934e5952543d617e9671e0e4ffe9c', from, to, '1', fromKey)
                 console.log(result)
             },
             

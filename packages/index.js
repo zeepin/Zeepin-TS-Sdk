@@ -323,6 +323,50 @@ export default class Zeepin {
         })
     }
 
+    /**
+     * GCP-10合约转账交易
+     *
+     * contractAddr: GCP-10合约地址，长度40, string
+     * from: 转出地址, string
+     * to: 转入地址, string
+     * amount: 转账金额(精度10000，如：需转账10，应填入100000), string
+     * fromKey: 转出账户私钥, string
+     */
+    static wasmTransfers(contractAddr, from, to, amount, fromKey, payer) {
+        if (myUrl === `http://192.168.199.244:20334` || myUrl === `http://test1.zeepin.net:20334`)
+            contracts = CONTRACTS_TEST;
+        else
+            contracts = CONTRACTS_MAIN;
+
+        if (contractAddr === '' || contractAddr.lenght !== 40) {
+            throw ERROR_CODE.INVALID_PARAMS;
+        }
+        return new Promise((resolve, reject) => {
+            const rest = new RestClient(myUrl);
+            const TxString = wasmTransfer(contractAddr, from, to, amount, '1', '20000', fromKey, payer);
+            rest.sendRawTransaction(TxString).then((res) => {
+                if (typeof res.Result === 'string' && res.Result.length === 64) {
+                    let timer = setInterval(() => {
+                        rest.getSmartCodeEvent(res.Result).then((getRes) => {
+                            if (getRes.Result !== null && getRes.Result !== '') {
+                                clearInterval(timer);
+                                timer = null;
+                                if (getRes.Result.State === 1 && getRes.Result.Notify[0].States[0].length > 10) {
+                                    resolve(getRes.Result.TxHash);
+                                    resolve(true);
+                                }
+                                else
+                                    reject(false);
+                            }
+                        })
+                    }, 1000)
+                } else {
+                    reject(false);
+                }
+            })
+        })
+    }
+
 
     /**
      * 返回签名后的交易zpt/gala
