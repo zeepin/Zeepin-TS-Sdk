@@ -338,8 +338,8 @@ export default class Zeepin {
         else
             contracts = CONTRACTS_MAIN;
 
-        if (contractAddr === '' || contractAddr.lenght !== 40) {
-            throw ERROR_CODE.INVALID_PARAMS;
+        if (contractAddr === "" || contractAddr.length !== 40) {
+          throw ERROR_CODE.INVALID_PARAMS;
         }
         return new Promise((resolve, reject) => {
             const rest = new RestClient(myUrl);
