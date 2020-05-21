@@ -56,6 +56,19 @@ export function programFromMultiPubKey(pubkeys: PublicKey[], m: number): string 
     return result;
 }
 
+export function pushBigInt(num: number): string {
+    if (num === -1) {
+        return num2hexstring(opcode.PUSHM1);
+    }
+    if (num === 0) {
+        return num2hexstring(opcode.PUSH0);
+    }
+    if (num > 0 && num <= 16) {
+        return num2hexstring(opcode.PUSH1 - 1 + num);
+    }
+    return num2hexstring(num, 8, true);
+}
+
 export function pushNum(num: number): string {
     if ( num === 0 ) {
         return pushOpCode(opcode.PUSH0);
@@ -174,4 +187,23 @@ export function programFromParams(sigs: string[]): string {
     }
     return result;
 }
+
+export const pushHexString = (param: string) => {
+    let result = '';
+    const len = param.length / 2;
+    if (len <= opcode.PUSHBYTES75) {
+        result += num2hexstring(len);
+    } else if (len < 0x100) {
+        result += num2hexstring(opcode.PUSHDATA1);
+        result += num2hexstring(len);
+    } else if (len < 0x10000) {
+        result += num2hexstring(opcode.PUSHDATA2);
+        result += num2hexstring(len, 2, true);
+    } else {
+        result += num2hexstring(opcode.PUSHDATA4);
+        result += num2hexstring(len, 4, true);
+    }
+    result += param;
+    return result;
+};
 

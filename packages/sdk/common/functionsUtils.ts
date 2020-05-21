@@ -206,6 +206,8 @@ export function hash160(SignatureScript: string): string {
     return ripemd160(sha256(SignatureScript));
 }
 
+
+
 /**
  * Computes ripemd-160 hash from hex encoded data.
  *
@@ -266,4 +268,15 @@ export function keystoreCheck(keystore: object) {
     if(!account.hasOwnProperty('salt')) {
         throw ERROR_CODE.Keystore_ERROR;
     }
+}
+
+export function bigIntFromBytes(bytes: string): Long {
+    const buff = Buffer.from(bytes, 'hex');
+    let data = Array.from(buff.subarray(0));
+    const b = data[data.length - 1];
+
+    if (b >> 7 === 1) {
+        data = data.concat(Array(8 - data.length).fill(255));
+    }
+    return Long.fromBytesLE(data);
 }

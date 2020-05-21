@@ -1,9 +1,10 @@
 import * as base58 from 'base-58';
 import { ADDR_VERSION } from '../common/consts';
 import { ERROR_CODE } from '../common/error';
-import { sha256, ab2hexstring, hash160, reverseHex } from '../common/functionsUtils';
+import opcode from '../common/opCode';
+import { sha256, ab2hexstring, hash160, reverseHex, num2hexstring} from '../common/functionsUtils';
+import { comparePublicKeys, programFromPubKey, pushBigInt, pushHexString} from '../crypto/programs';
 import { PublicKey } from "../crypto/publicKey";
-import { programFromPubKey } from "../crypto/programs";
 
 export class Address {
     /**
@@ -27,6 +28,36 @@ export class Address {
     static fromPubKey(publicKey: PublicKey): Address {
         const program = programFromPubKey(publicKey);
         const programHash = hash160(program);
+        return new Address(programHash);
+    }
+
+    /**
+     * Generates (m, n) threshold address.
+     *
+     * m - threshold
+     * n - total number of public keys
+     *
+     * @param m The threshold
+     * @param publicKeys Public key
+     */
+    static fromMultiPubKeys(m: number, publicKeys: PublicKey[]): Address {
+        const n = publicKeys.length;
+
+        if (m <= 0 || m > n || n > 24) {
+            throw ERROR_CODE.INVALID_PARAMS;
+        }
+
+        // const pkHexStrs = publicKeys.map((p) => p.serializeHex());
+        // pkHexStrs.sort();
+        publicKeys.sort(comparePublicKeys);
+        let result = '';
+        result += pushBigInt(m);
+        for (const s of publicKeys) {
+            result += pushHexString(s.serializeHex());
+        }
+        result += pushBigInt(n);
+        result += num2hexstring(opcode.CHECKMULTISIG);
+        const programHash = hash160(result);
         return new Address(programHash);
     }
 

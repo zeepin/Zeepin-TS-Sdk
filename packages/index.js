@@ -4,8 +4,8 @@ import { resultParams } from "./sdk/common/classesUtils";
 import RestClient from "./sdk/network/rest/restClient";
 import { CONTRACTS_TEST, CONTRACTS_MAIN } from "./sdk/common/consts";
 import { Address } from "./sdk/wallet/address";
-import { getContractBalance, wasmTransfer} from "./sdk/transaction/wasmTransaction";
-import { nativeTransfer, withdrawGala} from "./sdk/transaction/nativeTransaction";
+import { getContractBalance, wasmTransfer, makeMultiSignWasmTransaction} from "./sdk/transaction/wasmTransaction";
+import { nativeTransfer, withdrawGala, makeMultiSignTransaction, signMultiAddrTransaction} from "./sdk/transaction/nativeTransaction";
 import RpcClient from "./sdk/network/rpc/rpcClient";
 import {ERROR_CODE} from "./sdk/common/error";
 
@@ -351,7 +351,7 @@ export default class Zeepin {
                             if (getRes.Result !== null && getRes.Result !== '') {
                                 clearInterval(timer);
                                 timer = null;
-                                if (getRes.Result.State === 1 && getRes.Result.Notify[0].States[0].length > 10) {
+                                if (getRes.Result.State === 1 && getRes.Result.Notify[0].States[0].length > 7) {
                                     resolve(getRes.Result.TxHash);
                                     resolve(true);
                                 }
@@ -407,4 +407,53 @@ export default class Zeepin {
     static withdrawGalaStr(tokenType, claimer, to, amount, claimerKey) {
         return withdrawGala(tokenType, claimer, to, amount, '1', '20000', claimerKey);
     }
+
+    static makeMultiSignTransactionStr(asset, from, to, amount, gasPrice,
+        gasLimit, payer) {
+        return makeMultiSignTransaction(asset, from, to, amount, gasPrice, gasLimit, payer)
+    }
+
+    static makeMultiSignWasmTransactionStr(contractAddr, from, to, amount, gasPrice,
+        gasLimit, payer) {
+        return makeMultiSignWasmTransaction(contractAddr, from, to, amount, gasPrice, gasLimit, payer)
+    }
+
+    static signMultiAddrTransactionStr(
+        encryptedPrivateKey,
+        address,
+        salt,
+        password,
+        allRelatedPks,
+        requiredSignatureNum,
+        txDada) {
+        return signMultiAddrTransaction(encryptedPrivateKey, address, salt, password, allRelatedPks, requiredSignatureNum, txDada)
+    }
+
+    static sendSignTxnTransaction(TxString){
+     
+        return new Promise((resolve, reject) => {
+            const rest = new RestClient(myUrl);
+            rest.sendRawTransaction(TxString).then((res) => {
+                if (typeof res.Result === 'string' && res.Result.length === 64) {
+                    let timer = setInterval(() => {
+                        rest.getSmartCodeEvent(res.Result).then((getRes) => {
+                            if (getRes.Result !== null && getRes.Result !== '') {
+                                clearInterval(timer);
+                                timer = null;
+                                if (getRes.Result.State === 1) {
+                                    resolve(getRes.Result.TxHash);
+                                    resolve(true);
+                                }
+                                else
+                                    reject(false);
+                            }
+                        })
+                    }, 1000)
+                } else {
+                    reject(false);
+                }
+            })
+        })
+    }
+    
 }
