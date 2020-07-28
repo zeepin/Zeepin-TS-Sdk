@@ -14,9 +14,10 @@
         name: 'Index',
         mounted () {
             // this.test()
+            this.testImportAccount()
             // this.testGetHashData()
             // this.testUnboundGala();
-            this.testMutiSignAddress();
+            // this.testMutiSignAddress();
             // this.testWithdrawGala();
             // this.searchCurrency()
             // this.testTransaction()
@@ -34,6 +35,12 @@
                 console.log(native)
                 let otherAssets = await sdk.balanceOfOthers('ZTMpJFXdmgosonQn5KVy3fi8YmBkztAs4Q')
                 console.log(otherAssets)
+            },
+
+            async testImportAccount(){
+                let wif = "L1rmKZwzVD3Bz6QmQRufGeGK7bbuXMBMqCzeLSSZMCa4nvAWAqAw"
+                let account = Account.importAccountByWIFPrivateKey("11", wif, '')
+                console.log(account)
             },
 
             async testTransaction () {
