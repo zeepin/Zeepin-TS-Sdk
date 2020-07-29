@@ -39,7 +39,7 @@
 
             async testImportAccount(){
                 let wif = "L1rmKZwzVD3Bz6QmQRufGeGK7bbuXMBMqCzeLSSZMCa4nvAWAqAw"
-                let account = Account.importAccountByWIFPrivateKey("11", wif, '')
+                let account = await sdk.importByWIFPrivateKey("11", wif)
                 console.log(account)
             },
 

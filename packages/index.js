@@ -57,6 +57,15 @@ export default class Zeepin {
         return obj;
     }
 
+    static importByWIFPrivateKey(password, privateKey) {
+        let wallet = Wallet.importWalletByWIFPrivateKey(password, privateKey);
+        let obj = {
+            address: wallet.accounts[0].address.toBase58(),
+            keystore: wallet.toJsonObj(),
+            privateKey: wallet.accounts[0].exportPrivateKey(password).key
+        }
+        return obj;
+    }
     /**
      * 从keystore导入钱包
      *
@@ -211,7 +220,8 @@ export default class Zeepin {
      */
     static nativeTransfer(tokenType, from, to, amount, fromKey, payer) {
         return new Promise((resolve, reject) => {
-            const rest = new RestClient(myUrl);
+           // const rest = new RestClient(myUrl);
+            const rest = new RpcClient(myUrl);
             const TxString = nativeTransfer(tokenType, from, to, amount, '1', '20000', fromKey, payer);
             rest.sendRawTransaction(TxString).then((res) => {
                 if(typeof res.Result === 'string' && res.Result.length === 64) {

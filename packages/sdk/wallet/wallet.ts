@@ -36,6 +36,14 @@ export class Wallet {
         return wallet;
     }
 
+    static importWalletByWIFPrivateKey(password: string, privateKey: string, name?: string): Wallet {
+        const wallet = new Wallet();
+        wallet.accounts = [];
+        wallet.accounts.push(Account.importAccountByWIFPrivateKey(password, privateKey, name));
+        wallet.defaultAccountAddress = wallet.accounts[0].address.toBase58();
+        return wallet;
+    }
+
     static importWalletByKeystore(password: string, keystore: object): Wallet {
         const wallet = new Wallet();
 		// @ts-ignore
