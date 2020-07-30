@@ -220,8 +220,8 @@ export default class Zeepin {
      */
     static nativeTransfer(tokenType, from, to, amount, fromKey, payer) {
         return new Promise((resolve, reject) => {
-           // const rest = new RestClient(myUrl);
-            const rest = new RpcClient(myUrl);
+            const rest = new RestClient(myUrl);
+            //const rest = new RpcClient(myUrl);
             const TxString = nativeTransfer(tokenType, from, to, amount, '1', '20000', fromKey, payer);
             rest.sendRawTransaction(TxString).then((res) => {
                 if(typeof res.Result === 'string' && res.Result.length === 64) {
