@@ -18,6 +18,25 @@ export default class RpcClient {
         return request;
     }
 
+    /**
+   * Send ran transaction to blockchain.
+   * @param data Hex encoded data.
+   * @param preExec Decides if it is a pre-execute transaction.
+   */
+    sendRawTransaction(data: string, preExec: boolean = false): Promise<any> {
+        let req;
+
+        if (preExec) {
+            req = this.makeRequest('sendrawtransaction', data, 1);
+        } else {
+            req = this.makeRequest('sendrawtransaction', data);
+        }
+
+        return axios.post(this.url, req).then((res) => {
+            return res.data;
+        });
+    }
+
     getSmartCodeEvent(value: string | number): Promise<any> {
         const req = this.makeRequest('getsmartcodeevent', value);
 

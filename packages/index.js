@@ -4,8 +4,8 @@ import { resultParams } from "./sdk/common/classesUtils";
 import RestClient from "./sdk/network/rest/restClient";
 import { CONTRACTS_TEST, CONTRACTS_MAIN } from "./sdk/common/consts";
 import { Address } from "./sdk/wallet/address";
-import { getContractBalance, wasmTransfer } from "./sdk/transaction/wasmTransaction";
-import { nativeTransfer } from "./sdk/transaction/nativeTransaction";
+import { getContractBalance, wasmTransfer, makeMultiSignWasmTransaction} from "./sdk/transaction/wasmTransaction";
+import { nativeTransfer, withdrawGala, makeMultiSignTransaction, signMultiAddrTransaction} from "./sdk/transaction/nativeTransaction";
 import RpcClient from "./sdk/network/rpc/rpcClient";
 import {ERROR_CODE} from "./sdk/common/error";
 
@@ -57,6 +57,15 @@ export default class Zeepin {
         return obj;
     }
 
+    static importByWIFPrivateKey(password, privateKey) {
+        let wallet = Wallet.importWalletByWIFPrivateKey(password, privateKey);
+        let obj = {
+            address: wallet.accounts[0].address.toBase58(),
+            keystore: wallet.toJsonObj(),
+            privateKey: wallet.accounts[0].exportPrivateKey(password).key
+        }
+        return obj;
+    }
     /**
      * 从keystore导入钱包
      *
@@ -92,6 +101,44 @@ export default class Zeepin {
         return obj;
     }
 
+    /**
+     * 根据hash查询交易所在高度
+     * 
+     * txhash：交易哈希
+     */
+    static blockHeightByTxHash(txhash){
+        const rest = new RestClient(myUrl);
+        let result = []; 
+        return new Promise((resolve, reject) => {
+            rest.getBlockHeightByTxHash(txhash).then((res) => {
+                let param = new resultParams();
+                param.name = 'BlockHeight';
+                param.value = res.Result;
+                result.push(param);
+                resolve(result);
+            })
+        })
+    }
+
+    /**
+     * 根据hash查询交易结果
+     * 
+     * txhash:交易哈希
+     */
+    static smartCodeEventByTxHash(txhash){
+        const rest = new RestClient(myUrl);
+        let result = [];
+        return new Promise((resolve, reject) => {
+            rest.getSmartCodeEvent(txhash).then((res) => {
+                let param = new resultParams();
+                param.name = 'BlockHeight';
+                param.value = res.Result;
+                result.push(param);
+                resolve(result);
+            })
+        })
+    }
+
 
     /**
      * 查询ZPT和Gala余额
@@ -116,6 +163,25 @@ export default class Zeepin {
         })
     }
 
+    /**
+    * 查询该账户未提取的gala数量
+    *
+    * address: 账户地址
+    */
+    static unboundGala(address) {
+        const rest = new RestClient(myUrl);
+        let result = [];
+        return new Promise((resolve, reject) => {
+            rest.getUnboundGala(new Address(address)).then((res) => {
+                let param = new resultParams();
+                param.name = 'gala';
+                param.value = res.Result;
+                result.push(param);
+                resolve(result);
+            })
+        })
+    }
+
 
     /**
      * 查询ZUSD和7种矿石余额
@@ -124,11 +190,10 @@ export default class Zeepin {
      */
     static balanceOfOthers(address) {
         let result = [];
-        if(myUrl === `http://192.168.199.244:20334` || myUrl === `http://test1.zeepin.net`)
+        if(myUrl === `http://192.168.199.244:20334` || myUrl === `http://test1.zeepin.net:20334`)
             contracts = CONTRACTS_TEST;
         else
             contracts = CONTRACTS_MAIN;
-        console.log(contracts);
         return new Promise((resolve, reject) => {
             for (let i = 0; i < contracts.length; i++) {
                 getContractBalance(myUrl, contracts[i].contractAddr , address).then((res) => {
@@ -156,6 +221,7 @@ export default class Zeepin {
     static nativeTransfer(tokenType, from, to, amount, fromKey, payer) {
         return new Promise((resolve, reject) => {
             const rest = new RestClient(myUrl);
+            //const rest = new RpcClient(myUrl);
             const TxString = nativeTransfer(tokenType, from, to, amount, '1', '20000', fromKey, payer);
             rest.sendRawTransaction(TxString).then((res) => {
                 if(typeof res.Result === 'string' && res.Result.length === 64) {
@@ -164,8 +230,46 @@ export default class Zeepin {
                             if(getRes.Result !== null && getRes.Result !== '') {
                                 clearInterval(timer);
                                 timer = null;
-                                if(getRes.Result.State === 1)
+                                if(getRes.Result.State === 1){
+                                    resolve(getRes.Result.TxHash);
                                     resolve(true);
+                                }
+                                else
+                                    reject(false);
+                            }
+                        })
+                    }, 1000)
+                } else {
+                    reject(false);
+                }
+            })
+        })
+    }
+
+    /**
+     * 提取未解绑的gala
+     *
+     * tokenType: 'gala',小写, string
+     * claimer: 提取者地址, string
+     * to: 转入地址, string
+     * amount: 转账金额(精度10000，如：需转账10，应填入100000), string
+     * claimerKey: 提取账户私钥, string
+     */
+    static withdrawGala(tokenType, claimer, to, amount, claimerKey) {
+        return new Promise((resolve, reject) => {
+            const rest = new RestClient(myUrl);
+            const TxString = withdrawGala(tokenType, claimer, to, amount, '1', '20000', claimerKey,to);
+            rest.sendRawTransaction(TxString).then((res) => {
+                if (typeof res.Result === 'string' && res.Result.length === 64) {
+                    let timer = setInterval(() => {
+                        rest.getSmartCodeEvent(res.Result).then((getRes) => {
+                            if (getRes.Result !== null && getRes.Result !== '') {
+                                clearInterval(timer);
+                                timer = null;
+                                if (getRes.Result.State === 1) {
+                                    resolve(getRes.Result.TxHash);
+                                    resolve(true);
+                                }
                                 else
                                     reject(false);
                             }
@@ -189,7 +293,7 @@ export default class Zeepin {
      * fromKey: 转出账户私钥, string
      */
     static wasmTransfer(tokenType, from, to, amount, fromKey, payer) {
-        if(myUrl === `http://192.168.199.244:20334` || myUrl === `http://test1.zeepin.net`)
+        if(myUrl === `http://192.168.199.244:20334` || myUrl === `http://test1.zeepin.net:20334`)
             contracts = CONTRACTS_TEST;
         else
             contracts = CONTRACTS_MAIN;
@@ -213,8 +317,54 @@ export default class Zeepin {
                             if(getRes.Result !== null && getRes.Result !== '') {
                                 clearInterval(timer);
                                 timer = null;
-                                if(getRes.Result.State === 1 && getRes.Result.Notify[0].States[0].length > 10)
+                                if(getRes.Result.State === 1 && getRes.Result.Notify[0].States[0].length > 10){
+                                    resolve(getRes.Result.TxHash);
                                     resolve(true);
+                                }
+                                else
+                                    reject(false);
+                            }
+                        })
+                    }, 1000)
+                } else {
+                    reject(false);
+                }
+            })
+        })
+    }
+
+    /**
+     * GCP-10合约转账交易
+     *
+     * contractAddr: GCP-10合约地址，长度40, string
+     * from: 转出地址, string
+     * to: 转入地址, string
+     * amount: 转账金额(精度10000，如：需转账10，应填入100000), string
+     * fromKey: 转出账户私钥, string
+     */
+    static wasmTransfers(contractAddr, from, to, amount, fromKey, payer) {
+        if (myUrl === `http://192.168.199.244:20334` || myUrl === `http://test1.zeepin.net:20334`)
+            contracts = CONTRACTS_TEST;
+        else
+            contracts = CONTRACTS_MAIN;
+
+        if (contractAddr === "" || contractAddr.length !== 40) {
+          throw ERROR_CODE.INVALID_PARAMS;
+        }
+        return new Promise((resolve, reject) => {
+            const rest = new RestClient(myUrl);
+            const TxString = wasmTransfer(contractAddr, from, to, amount, '1', '20000', fromKey, payer);
+            rest.sendRawTransaction(TxString).then((res) => {
+                if (typeof res.Result === 'string' && res.Result.length === 64) {
+                    let timer = setInterval(() => {
+                        rest.getSmartCodeEvent(res.Result).then((getRes) => {
+                            if (getRes.Result !== null && getRes.Result !== '') {
+                                clearInterval(timer);
+                                timer = null;
+                                if (getRes.Result.State === 1 && getRes.Result.Notify[0].States[0].length > 7) {
+                                    resolve(getRes.Result.TxHash);
+                                    resolve(true);
+                                }
                                 else
                                     reject(false);
                             }
@@ -254,4 +404,66 @@ export default class Zeepin {
     static wasmTransferStr(tokenType, from, to, amount, fromKey, payer) {
         return wasmTransfer(tokenType, from, to, amount, '1', '20000', fromKey, payer);
     }
+
+    /**
+    * 挖gala
+    *
+    * tokenType: ‘gala’ 对含有zpt资产的用户解锁gala
+    * claimer: 挖取gala地址, string
+    * to: 转入地址, string
+    * amount: 转账金额(精度10000，如：需转账10，应填入100000), string
+    * fromKey: 挖取账户私钥, string
+    */
+    static withdrawGalaStr(tokenType, claimer, to, amount, claimerKey) {
+        return withdrawGala(tokenType, claimer, to, amount, '1', '20000', claimerKey);
+    }
+
+    static makeMultiSignTransactionStr(asset, from, to, amount, gasPrice,
+        gasLimit, payer) {
+        return makeMultiSignTransaction(asset, from, to, amount, gasPrice, gasLimit, payer)
+    }
+
+    static makeMultiSignWasmTransactionStr(contractAddr, from, to, amount, gasPrice,
+        gasLimit, payer) {
+        return makeMultiSignWasmTransaction(contractAddr, from, to, amount, gasPrice, gasLimit, payer)
+    }
+
+    static signMultiAddrTransactionStr(
+        encryptedPrivateKey,
+        address,
+        salt,
+        password,
+        allRelatedPks,
+        requiredSignatureNum,
+        txDada) {
+        return signMultiAddrTransaction(encryptedPrivateKey, address, salt, password, allRelatedPks, requiredSignatureNum, txDada)
+    }
+
+    static sendSignTxnTransaction(TxString){
+     
+        return new Promise((resolve, reject) => {
+            const rest = new RestClient(myUrl);
+            rest.sendRawTransaction(TxString).then((res) => {
+                if (typeof res.Result === 'string' && res.Result.length === 64) {
+                    let timer = setInterval(() => {
+                        rest.getSmartCodeEvent(res.Result).then((getRes) => {
+                            if (getRes.Result !== null && getRes.Result !== '') {
+                                clearInterval(timer);
+                                timer = null;
+                                if (getRes.Result.State === 1) {
+                                    resolve(getRes.Result.TxHash);
+                                    resolve(true);
+                                }
+                                else
+                                    reject(false);
+                            }
+                        })
+                    }, 1000)
+                } else {
+                    reject(false);
+                }
+            })
+        })
+    }
+    
 }

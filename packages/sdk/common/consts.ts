@@ -51,6 +51,8 @@ export const NATIVE_INVOKE_NAME = 'ZeepinChain.Native.Invoke';
 export const ZPT_CONTRACT = '0000000000000000000000000000000000000001';
 export const GALA_CONTRACT = '0000000000000000000000000000000000000002';
 
+export const TX_MAX_SIG_SIZE = 16;
+
 // contracts addresses under test net
 export const CONTRACTS_TEST = [
     {
